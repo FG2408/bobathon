@@ -1,0 +1,91 @@
+[
+  {
+    "id": "CLM-001",
+    "label": "Routine windscreen chip",
+    "claim_type": "Motor",
+    "amount_sgd": 450,
+    "summary": "Policyholder reports a small stone chip on the windscreen while driving on the PIE yesterday morning. No injuries and the vehicle is drivable. Photos of the chip and a dashcam clip are attached. The policy has been active for 4 years with no previous claims. Requesting windscreen repair at an approved workshop.",
+    "expected": {
+      "priority": "Low",
+      "escalate": false,
+      "fraud_flags": [],
+      "key_actions": ["Approve repair at panel workshop", "Standard documentation check"]
+    }
+  },
+  {
+    "id": "CLM-002",
+    "label": "Urgent but legitimate - burst pipe",
+    "claim_type": "Home",
+    "amount_sgd": 38000,
+    "summary": "A burst water pipe flooded the kitchen and living room of a 3-bedroom flat at 2am. Electricity has been shut off and a family of four is staying with relatives. A plumber's report and time-stamped photos are attached. The policy has been active for 6 years with one unrelated claim in 2022. The family needs temporary accommodation and urgent repairs.",
+    "expected": {
+      "priority": "High",
+      "escalate": false,
+      "fraud_flags": [],
+      "key_actions": ["Expedite assessment", "Arrange loss adjuster visit within 48 hours", "Offer temporary accommodation benefit"]
+    }
+  },
+  {
+    "id": "CLM-003",
+    "label": "Commercial fire with fraud red flags",
+    "claim_type": "Commercial Property",
+    "amount_sgd": 400000,
+    "summary": "Fire in the storeroom of a retail shop 9 days after the owner increased stock coverage from 80,000 to 400,000. No fire department report is available yet. The owner says the stock was mostly electronics but can only provide handwritten cash receipts, not purchase invoices. The owner is pressing for full payout within 3 days and declined a site inspection because the premises are being cleared. Two prior claims on other policies were made in the past 18 months.",
+    "expected": {
+      "priority": "High",
+      "escalate": true,
+      "fraud_flags": [
+        "recent_coverage_increase",
+        "missing_official_report",
+        "cash_only_documentation",
+        "pressure_for_fast_settlement",
+        "refuses_inspection",
+        "prior_claims_pattern"
+      ],
+      "key_actions": ["Refer to Special Investigations Unit", "Request fire department report", "Preserve the site and suspend payment pending inspection", "Verify stock through supplier records"]
+    }
+  },
+  {
+    "id": "CLM-004",
+    "label": "Serious injury with litigation risk",
+    "claim_type": "Motor - Third Party Bodily Injury",
+    "amount_sgd": 850000,
+    "summary": "A pedestrian was struck at a junction and taken to hospital with a fractured pelvis, expecting surgery and long-term rehabilitation. The third party's lawyer has sent a letter of demand for 850,000 and states that court proceedings will be filed in 14 days. A police report has been filed and CCTV footage is available. The policyholder's account is consistent with the police report.",
+    "expected": {
+      "priority": "Critical",
+      "escalate": true,
+      "fraud_flags": [],
+      "key_actions": ["Escalate to senior claims manager and legal", "Appoint panel lawyer before the 14-day deadline", "Secure CCTV and police report", "Set reserve"]
+    }
+  },
+  {
+    "id": "CLM-005",
+    "label": "Vague and incomplete submission",
+    "claim_type": "Unspecified",
+    "amount_sgd": null,
+    "summary": "My phone was damaged. Need to claim. Please process.",
+    "expected": {
+      "priority": "Medium",
+      "escalate": false,
+      "fraud_flags": ["insufficient_detail"],
+      "key_actions": ["Request incident date, cause, and photos", "Confirm the policy covers the device", "Hold triage until details are received"]
+    }
+  },
+  {
+    "id": "CLM-006",
+    "label": "Urgent and suspicious - overseas medical",
+    "claim_type": "Travel Medical",
+    "amount_sgd": 62000,
+    "summary": "Policyholder is currently hospitalised abroad after emergency surgery and the family is requesting a guarantee of payment. The hospital invoice is a scanned copy where the discharge date is earlier than the admission date. The travel policy was purchased 2 days before departure. The treatment relates to a condition the policyholder mentioned in a previous, incomplete application.",
+    "expected": {
+      "priority": "High",
+      "escalate": true,
+      "fraud_flags": [
+        "recent_policy_inception",
+        "document_inconsistency",
+        "possible_pre_existing_condition"
+      ],
+      "key_actions": ["Do not delay urgent medical guarantee decision", "Verify invoice directly with the hospital", "Review pre-existing condition disclosure", "Escalate to medical underwriting and SIU in parallel"]
+    }
+  }
+]

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Result #{{ row['id'] }} — Claims Triage{% endblock %}
+
+{% set priority_class = {
+    'Critical': 'danger',
+    'High':     'warning',
+    'Medium':   'info',
+    'Low':      'success'
+} %}
+{% set pc = priority_class.get(result.priority, 'secondary') %}
+
+{% block content %}
+
+{# ── Header row ──────────────────────────────────────────────────────────── #}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <h1 class="h4 mb-0">Triage Result — Claim #{{ row['id'] }}</h1>
+    <small class="text-muted">
+      {{ row['submitted_at'] }} UTC
+      {% if row['claim_type'] %} · {{ row['claim_type'] }}{% endif %}
+      {% if row['amount_band'] %} · {{ row['amount_band'] }}{% endif %}
+    </small>
+  </div>
+  <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm">
+    ← New Claim
+  </a>
+</div>
+
+{# ── Escalation banner ────────────────────────────────────────────────────── #}
+{% if result.escalate %}
+<div class="alert alert-danger escalation-banner mb-4" role="alert">
+  <strong>⚠ Escalation Required</strong>
+  {% if result.escalation_reason %} — {{ result.escalation_reason }}{% endif %}
+  {% if result.escalation_routes %}
+    <ul class="mb-0 mt-1">
+      {% for route in result.escalation_routes %}
+        <li>Escalate to: <strong>{{ route }}</strong></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ── Score cards ──────────────────────────────────────────────────────────── #}
+<div class="row g-3 mb-4">
+
+  <div class="col-sm-4">
+    <div class="card h-100 text-center border-{{ pc }}">
+      <div class="card-body">
+        <div class="text-muted small mb-1 text-uppercase fw-semibold">Priority</div>
+        <span class="badge bg-{{ pc }} fs-5 px-3 py-2">{{ result.priority }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-4">
+    <div class="card h-100 text-center">
+      <div class="card-body">
+        <div class="text-muted small mb-1 text-uppercase fw-semibold">Triage Score</div>
+        <div class="score-label text-{{ pc }}">{{ result.score }}</div>
+        <div class="progress mt-2" style="height:8px">
+          <div class="progress-bar bg-{{ pc }}"
+               role="progressbar"
+               style="width:{{ result.score }}%"
+               aria-valuenow="{{ result.score }}"
+               aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <small class="text-muted">/ 100</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-4">
+    <div class="card h-100 text-center">
+      <div class="card-body">
+        <div class="text-muted small mb-1 text-uppercase fw-semibold">Fraud Score</div>
+        <div class="fraud-score-label {% if result.fraud_score >= 40 %}text-danger{% else %}text-secondary{% endif %}">
+          {{ result.fraud_score }}
+        </div>
+        <div class="progress mt-2" style="height:8px">
+          <div class="progress-bar {% if result.fraud_score >= 40 %}bg-danger{% else %}bg-secondary{% endif %}"
+               role="progressbar"
+               style="width:{{ result.fraud_score }}%"
+               aria-valuenow="{{ result.fraud_score }}"
+               aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <small class="text-muted">/ 100</small>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{# ── Rationale ─────────────────────────────────────────────────────────────── #}
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="card-title mb-2">Rationale</h5>
+    <p class="rationale-text mb-0">{{ result.rationale }}</p>
+  </div>
+</div>
+
+{# ── Fraud indicators ──────────────────────────────────────────────────────── #}
+{% if result.fraud_indicators %}
+<div class="card mb-4 border-danger">
+  <div class="card-header bg-danger text-white fw-semibold">
+    🚩 Fraud Indicators ({{ result.fraud_indicators | length }})
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Flag</th>
+          <th>Label</th>
+          <th>Evidence (quoted from claim)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fi in result.fraud_indicators %}
+        <tr>
+          <td><code>{{ fi.flag }}</code></td>
+          <td>{{ fi.label }}</td>
+          <td class="evidence-cell">"{{ fi.evidence }}"</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card mb-4">
+  <div class="card-body text-muted">
+    ✅ No fraud indicators detected.
+  </div>
+</div>
+{% endif %}
+
+{# ── Risk factors ─────────────────────────────────────────────────────────── #}
+{% if result.risk_factors %}
+<div class="card mb-4">
+  <div class="card-header fw-semibold">⚡ Risk / Urgency Factors ({{ result.risk_factors | length }})</div>
+  <div class="card-body p-0">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Flag</th>
+          <th>Label</th>
+          <th>Evidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rf in result.risk_factors %}
+        <tr>
+          <td><code>{{ rf.flag }}</code></td>
+          <td>{{ rf.label }}</td>
+          <td class="evidence-cell">"{{ rf.evidence }}"</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{# ── Recommended actions ──────────────────────────────────────────────────── #}
+<div class="card mb-4">
+  <div class="card-header fw-semibold">✅ Recommended Actions</div>
+  <ul class="list-group list-group-flush">
+    {% for action in result.recommended_actions %}
+    <li class="list-group-item">{{ action }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+{# ── Original claim text ──────────────────────────────────────────────────── #}
+<div class="card mb-4">
+  <div class="card-header fw-semibold text-muted">Submitted Claim Text</div>
+  <div class="card-body">
+    <p class="mb-0" style="white-space:pre-wrap">{{ row['claim_text'] }}</p>
+  </div>
+</div>
+
+<div class="text-end">
+  <a href="{{ url_for('main.history') }}" class="btn btn-outline-secondary btn-sm">View History</a>
+</div>
+
+{% endblock %}

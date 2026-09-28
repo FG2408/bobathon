@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Claim History — Claims Triage{% endblock %}
+
+{% set priority_class = {
+    'Critical': 'danger',
+    'High':     'warning',
+    'Medium':   'info',
+    'Low':      'success'
+} %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h1 class="h4 mb-0">Claim History</h1>
+  <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-sm">+ New Claim</a>
+</div>
+
+{% if claims %}
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Submitted (UTC)</th>
+          <th>Type</th>
+          <th>Amount Band</th>
+          <th class="text-center">Score</th>
+          <th class="text-center">Fraud</th>
+          <th class="text-center">Priority</th>
+          <th class="text-center">Escalate</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in claims %}
+        <tr>
+          <td class="text-muted small">{{ c.id }}</td>
+          <td class="small">{{ c.submitted_at }}</td>
+          <td class="small">{{ c.claim_type }}</td>
+          <td class="small">{{ c.amount_band }}</td>
+          <td class="text-center fw-semibold">{{ c.score }}</td>
+          <td class="text-center {% if c.fraud_score >= 40 %}text-danger fw-semibold{% else %}text-muted{% endif %}">
+            {{ c.fraud_score }}
+          </td>
+          <td class="text-center">
+            <span class="badge bg-{{ priority_class.get(c.priority, 'secondary') }}">
+              {{ c.priority }}
+            </span>
+          </td>
+          <td class="text-center">
+            {% if c.escalate %}
+              <span class="badge bg-danger">Yes</span>
+            {% else %}
+              <span class="badge bg-light text-muted border">No</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('main.result', claim_id=c.id) }}"
+               class="btn btn-outline-primary btn-sm">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% else %}
+<div class="text-center text-muted py-5">
+  <p class="fs-5">No claims submitted yet.</p>
+  <a href="{{ url_for('main.index') }}" class="btn btn-primary">Submit your first claim</a>
+</div>
+{% endif %}
+
+{% endblock %}

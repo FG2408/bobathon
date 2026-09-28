@@ -1,0 +1,138 @@
+{
+  "_help": "Edit weights, patterns and actions here. Patterns are case-insensitive regular expressions. Priority score = urgency + severity + amount points + (fraud score x fraud_priority_weight), capped at 100.",
+
+  "priority_bands": { "Critical": 70, "High": 45, "Medium": 20, "Low": 0 },
+  "fraud_priority_weight": 0.25,
+  "fraud_escalation_score": 40,
+  "large_amount_sgd": 250000,
+  "min_words": 25,
+
+  "amount_bands": [
+    { "min": 500000, "points": 30, "label": "very large" },
+    { "min": 100000, "points": 20, "label": "large" },
+    { "min": 25000, "points": 10, "label": "significant" }
+  ],
+
+  "baseline_actions": {
+    "Low": ["Process under the standard workflow"],
+    "Medium": ["Assign for standard review within the normal SLA"],
+    "High": ["Fast-track to an experienced claims officer today"],
+    "Critical": ["Assign immediately to a senior claims officer"]
+  },
+
+  "urgency_signals": [
+    {
+      "key": "serious_injury", "label": "Serious injury or hospitalisation", "weight": 30,
+      "patterns": ["fractur", "surgery", "hospitali[sz]", "taken to hospital", "intensive care", "\\bICU\\b", "life-threatening", "rehabilitation"],
+      "actions": ["Confirm medical status and treatment costs", "Check whether a guarantee of payment is needed"]
+    },
+    {
+      "key": "fatality", "label": "Fatality", "weight": 40,
+      "patterns": ["\\bfatal", "\\bdied\\b", "\\bdeath\\b", "deceased"],
+      "actions": ["Assign to a senior officer with bereavement-handling training"]
+    },
+    {
+      "key": "minor_injury", "label": "Injury reported", "weight": 12,
+      "patterns": ["injur", "\\bhurt\\b", "whiplash", "bruis"],
+      "actions": ["Obtain a medical report or certificate"]
+    },
+    {
+      "key": "displaced", "label": "Policyholder displaced from home", "weight": 25,
+      "patterns": ["displaced", "no shelter", "homeless", "staying with relatives", "temporary accommodation", "uninhabitable", "cannot live"],
+      "actions": ["Offer the temporary accommodation benefit if covered", "Arrange a loss adjuster visit within 48 hours"]
+    },
+    {
+      "key": "fire_explosion", "label": "Fire or explosion", "weight": 20,
+      "patterns": ["\\bfire\\b", "\\bblaze\\b", "explosion", "\\bburnt\\b", "\\bburned\\b"],
+      "actions": ["Request the fire department report", "Arrange a loss adjuster site inspection"]
+    },
+    {
+      "key": "water_damage", "label": "Flooding or water damage", "weight": 15,
+      "patterns": ["flood", "burst (water )?pipe", "water damage", "water ingress"],
+      "actions": ["Request a plumber or contractor report", "Advise the policyholder on mitigating further damage"]
+    },
+    {
+      "key": "essential_services", "label": "Loss of essential services", "weight": 10,
+      "patterns": ["electricity (has been )?shut off", "no electricity", "no power", "power (outage|cut)", "no (running )?water", "no heating"],
+      "actions": ["Prioritise emergency repair authorisation"]
+    },
+    {
+      "key": "total_loss", "label": "Total loss or destruction", "weight": 15,
+      "patterns": ["total loss", "written off", "write-off", "destroyed", "beyond repair", "gutted"],
+      "actions": ["Obtain a valuation for the insured item"]
+    },
+    {
+      "key": "regulatory_deadline", "label": "Regulatory or deadline pressure", "weight": 15,
+      "patterns": ["deadline", "statutory", "regulator", "ombudsman", "fidrec", "\\bMAS\\b"],
+      "actions": ["Check the regulatory response deadline and diarise it"]
+    }
+  ],
+
+  "severity_signals": [
+    {
+      "key": "litigation", "label": "Litigation or legal threat", "weight": 30,
+      "escalate_to": "Legal team",
+      "patterns": ["lawyer", "solicitor", "attorney", "letter of demand", "court proceedings", "lawsuit", "\\bsu(e|es|ed|ing)\\b", "litigation"],
+      "actions": ["Notify the legal team and diarise the response deadline", "Appoint a panel lawyer if proceedings are likely"]
+    },
+    {
+      "key": "third_party", "label": "Third party involved", "weight": 10,
+      "patterns": ["third[- ]party", "pedestrian", "other driver", "other vehicle"],
+      "actions": ["Obtain the third party's contact and insurer details"]
+    }
+  ],
+
+  "fraud_indicators": [
+    {
+      "key": "recent_coverage_increase", "label": "Recent increase in coverage", "weight": 20,
+      "patterns": ["increased\\s+(\\w+\\s+)?(coverage|cover|sum insured)", "raised\\s+(\\w+\\s+)?(coverage|cover|sum insured)", "(coverage|cover)\\s+(was\\s+)?increased", "upgraded\\s+(\\w+\\s+)?(coverage|cover|policy)"],
+      "actions": ["Verify the policy change dates and the reason for the increase"]
+    },
+    {
+      "key": "recent_policy_inception", "label": "Loss soon after policy inception", "weight": 20,
+      "patterns": ["(purchased|bought|taken out|incepted|took out)\\s+(\\w+\\s+){0,3}\\d+\\s+(days?|weeks?)\\s+(before|prior to|ago)", "(newly (purchased|issued)|recently (purchased|taken out))\\s+policy", "policy\\s+(was\\s+)?(purchased|bought|taken out)\\s+(just|only|recently)"],
+      "actions": ["Verify the policy inception date against the date of loss", "Check the application for non-disclosure"]
+    },
+    {
+      "key": "missing_official_report", "label": "No official report available", "weight": 15,
+      "patterns": ["no\\s+(police|fire(\\s+department)?)\\s+report", "(police|fire(\\s+department)?)\\s+report\\s+(is\\s+|was\\s+|has\\s+been\\s+)?(not|un)available", "(not|never)\\s+(filed|lodged|made)\\s+(a\\s+)?(police\\s+)?report", "without\\s+(a\\s+)?(police|fire)\\s+report"],
+      "actions": ["Request the police or fire department report"]
+    },
+    {
+      "key": "cash_only_documentation", "label": "Cash-only or weak documentation", "weight": 15,
+      "patterns": ["cash\\s+(receipts?|invoices?|payment|only)", "handwritten\\s+(receipts?|invoices?)", "no\\s+(receipts?|invoices?)", "cannot\\s+provide\\s+(\\w+\\s+)?(receipts?|invoices?)"],
+      "actions": ["Request supplier invoices and bank payment records"]
+    },
+    {
+      "key": "pressure_for_fast_settlement", "label": "Pressure for fast settlement", "weight": 15,
+      "patterns": ["pressing\\s+for", "(payout|payment|settlement)\\s+(\\w+\\s+){0,3}within\\s+\\d+\\s+(days?|hours?)", "(immediate|urgent)\\s+(payout|payment|settlement)", "insists?\\s+on\\s+(immediate|quick|fast)", "demands?\\s+(immediate\\s+)?(payout|payment)"],
+      "actions": ["Do not commit to a settlement timeline until verification is complete"]
+    },
+    {
+      "key": "refuses_inspection", "label": "Refuses or avoids inspection", "weight": 20,
+      "patterns": ["(declined|refused|refuses|declines|unwilling\\s+to\\s+allow|denied\\s+access)\\s+(\\w+\\s+){0,3}(inspection|site\\s+visit|assessment)"],
+      "actions": ["Require an inspection before payment and preserve the site", "Suspend payment pending inspection"]
+    },
+    {
+      "key": "prior_claims_pattern", "label": "Pattern of prior claims", "weight": 15,
+      "patterns": ["(two|three|four|five|six|multiple|several|repeated|\\d+)\\s+(prior|previous|earlier|recent)\\s+claims", "frequent\\s+claims", "history\\s+of\\s+(\\w+\\s+)?claims"],
+      "actions": ["Run a claims history check across insurers"]
+    },
+    {
+      "key": "document_inconsistency", "label": "Inconsistent dates or documents", "weight": 20,
+      "patterns": ["inconsisten", "discrepanc", "date\\s+is\\s+(earlier|before|later|after)", "dates?\\s+(do|does)\\s+not\\s+match", "conflicting", "\\baltered\\b", "changed\\s+(his|her|their)\\s+(story|account)"],
+      "actions": ["Verify the documents directly with the issuer"]
+    },
+    {
+      "key": "possible_pre_existing_condition", "label": "Possible pre-existing condition", "weight": 20,
+      "patterns": ["pre-?existing", "(previous|earlier|prior),?\\s+(incomplete\\s+)?application", "undisclosed", "non-?disclosure", "prior\\s+(illness|treatment|diagnosis)"],
+      "actions": ["Review the application for non-disclosure of the condition"]
+    }
+  ],
+
+  "insufficient_detail": {
+    "key": "insufficient_detail", "label": "Insufficient detail in claim summary", "weight": 10,
+    "priority_floor": "Medium",
+    "actions": ["Request incident date, cause and supporting photos or documents", "Confirm the policy and cover that apply", "Hold triage until the missing details are received"]
+  }
+}

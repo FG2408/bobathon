@@ -1,0 +1,36 @@
+/* Claims Triage — base styles (Bootstrap 5 handles layout) */
+
+/* Priority badge colours are handled by Bootstrap contextual classes.
+   These extras add small polish for the results page. */
+
+.score-label {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.fraud-score-label {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.evidence-cell {
+    font-style: italic;
+    color: #495057;
+}
+
+.escalation-banner {
+    border-left: 4px solid #dc3545;
+}
+
+.rationale-text {
+    font-size: 1.05rem;
+}
+
+/* History table — tighten up on smaller screens */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}

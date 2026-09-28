@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Submit Claim — Claims Triage{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <h1 class="h3 mb-1">Submit a Claim for Triage</h1>
+    <p class="text-muted mb-4">
+      Paste the claim summary below. The optional fields enrich the scoring.
+    </p>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('main.score') }}">
+
+          <div class="mb-4">
+            <label for="claim_text" class="form-label fw-semibold">
+              Claim Summary <span class="text-danger">*</span>
+            </label>
+            <textarea
+              id="claim_text"
+              name="claim_text"
+              class="form-control"
+              rows="8"
+              placeholder="Describe the incident, injuries, damages, and any supporting documents available…"
+              required
+            ></textarea>
+            <div class="form-text">
+              At least 25 words gives the engine enough detail to score accurately.
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label for="claim_type" class="form-label fw-semibold">Claim Type</label>
+              <select id="claim_type" name="claim_type" class="form-select">
+                <option value="">— Select (optional) —</option>
+                {% for ct in claim_types %}
+                  <option value="{{ ct }}">{{ ct }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="amount_band" class="form-label fw-semibold">Claimed Amount (SGD)</label>
+              <select id="amount_band" name="amount_band" class="form-select">
+                <option value="">— Select (optional) —</option>
+                {% for label, _ in amount_bands %}
+                  <option value="{{ label }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">
+              Analyse Claim →
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
